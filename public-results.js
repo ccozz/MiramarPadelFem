@@ -52,7 +52,7 @@
         sb.from('groups').select('id,name').eq('category_id', category.id).order('name'),
         sb.from('matches').select('group_id,pair_one_id,pair_two_id,score,winner_pair_id').eq('category_id', category.id).eq('stage', 'group')
       ]);
-      if (!groups?.length) return `<section data-public-results="true"><small>03 · RESULTADOS</small><p>Fixture próximo a publicarse.</p></section>`;
+      if (!groups?.length) return `<section data-public-results="true" id="tournament-groups"><small>02 · FIXTURE</small><p>El fixture se publicará al cerrar las inscripciones.</p></section><section data-public-results="true" id="tournament-results"><small>03 · RESULTADOS</small><p>Los resultados se publicarán cuando comience el torneo.</p></section>`;
       hasPublishedGroups = true;
       const pairMap = new Map((pairs || []).map(pair => [pair.id, pair]));
       const groupCards = groups.map(group => {
