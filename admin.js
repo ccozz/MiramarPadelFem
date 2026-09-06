@@ -16,6 +16,7 @@ setTheme(localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: da
 themeToggle?.addEventListener('click', () => { const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; localStorage.setItem('theme', theme); setTheme(theme); });
 
 const esc = (value = '') => String(value).replace(/[&<>'"]/g, char => ({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;' }[char]));
+const signed = value => value > 0 ? `+${value}` : String(value);
 const numeric = value => /^[0-9]+$/.test(String(value));
 const scoreOptions = selected => `<option value=""></option>${Array.from({ length: 51 }, (_, value) => `<option value="${value}" ${String(selected) === String(value) ? 'selected' : ''}>${value}</option>`).join('')}`;
 const scoreSets = score => String(score || '').split(',').map(part => part.trim().match(/^(\d+)\s*-\s*(\d+)$/)).filter(Boolean).map(values => [Number(values[1]), Number(values[2])]);
@@ -172,7 +173,7 @@ async function renderResults() {
     const pendingForms = groupMatches.filter(match => !match.winner_pair_id).map(match => matchForm(match)).join('') || '<p>No hay partidos pendientes.</p>';
     const finishedMatches = groupMatches.filter(match => match.winner_pair_id);
     const finishedForms = finishedMatches.length ? `<details class="completed-matches"><summary>Terminados (${finishedMatches.length})</summary>${finishedMatches.map(match => match.id === editingMatchId ? matchForm(match, true) : finishedCard(match)).join('')}</details>` : '';
-    const tableRows = rows.map((row, index) => `<tr><td>${index + 1}</td><td>${esc(row.label)}</td><td>${row.played}</td><td>${row.won}</td><td>${row.lost}</td><td>${row.setsWon - row.setsLost}</td><td>${row.gamesWon - row.gamesLost}</td><td>${row.points}</td></tr>`).join('');
+    const tableRows = rows.map((row, index) => `<tr><td>${index + 1}</td><td>${esc(row.label)}</td><td>${row.played}</td><td>${row.won}</td><td>${row.lost}</td><td>${signed(row.setsWon - row.setsLost)}</td><td>${signed(row.gamesWon - row.gamesLost)}</td><td>${row.points}</td></tr>`).join('');
     return `<details class="admin-card results-group"><summary>${esc(group.name)}</summary><div class="results-group__content"><p>${groupPairs.length} parejas · sistema: victoria 1 punto, derrota 0 puntos.</p><div class="table-wrap"><table><thead><tr><th>#</th><th>Pareja</th><th>PJ</th><th>G</th><th>P</th><th>DS</th><th>DG</th><th>Pts</th></tr></thead><tbody>${tableRows}</tbody></table></div><h3>Partidos pendientes</h3>${pendingForms}${finishedForms}</div></details>`;
   }).join('');
   const playoffHtml = playoffStages.map(stage => {

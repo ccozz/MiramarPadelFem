@@ -2,6 +2,7 @@
   const sb = window.supabase.createClient('https://scdgdfxkvkgqueeozznd.supabase.co', 'sb_publishable_UgQh8Fq2C-ydgDCPSbii6A_J5Eqoia1');
   const esc = (value = '') => String(value).replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
   const label = pair => `${pair.player_one_alias} / ${pair.player_two_alias}`;
+  const signed = value => value > 0 ? `+${value}` : String(value);
   const formatRange = (start, end) => {
     const shortDate = value => { const [, month, day] = String(value || '').split('-'); return month && day ? `${day}/${month}` : ''; };
     return `${shortDate(start)} - ${shortDate(end)}`;
@@ -49,7 +50,7 @@
         const groupPairs = (pairs || []).filter(pair => pair.group_name === group.name);
         const groupMatches = (matches || []).filter(match => match.group_id === group.id);
         const rows = window.PadelTournament.buildStandings(groupPairs, groupMatches);
-        const table = rows.map((row, index) => `<tr><td>${index + 1}</td><td>${esc(row.label)}</td><td>${row.played}</td><td>${row.won}</td><td>${row.lost}</td><td>${row.setsWon - row.setsLost}</td><td>${row.gamesWon - row.gamesLost}</td><td>${row.points}</td></tr>`).join('');
+        const table = rows.map((row, index) => `<tr><td>${index + 1}</td><td>${esc(row.label)}</td><td>${row.played}</td><td>${row.won}</td><td>${row.lost}</td><td>${signed(row.setsWon - row.setsLost)}</td><td>${signed(row.gamesWon - row.gamesLost)}</td><td>${row.points}</td></tr>`).join('');
         const played = groupMatches.filter(match => match.winner_pair_id).map(match => {
           const pairOneWon = match.winner_pair_id === match.pair_one_id;
           const winner = pairMap.get(pairOneWon ? match.pair_one_id : match.pair_two_id) || {};
