@@ -12,6 +12,7 @@ html[data-theme='dark'] .public-table-wrap table,html[data-theme='dark'] .public
 
 /* La clasificación se comprime y envuelve nombres: nunca desplaza la pantalla lateralmente. */
 .public-table-wrap{overflow:hidden}.public-table-wrap table{min-width:0!important;table-layout:fixed}.public-table-wrap th,.public-table-wrap td{padding:9px 3px;font-size:10px}.public-table-wrap th:nth-child(2),.public-table-wrap td:nth-child(2){width:34%;min-width:0;white-space:normal;overflow-wrap:anywhere;line-height:1.15}.public-table-wrap th:not(:nth-child(2)),.public-table-wrap td:not(:nth-child(2)){width:9.42%}
+.public-playoff-match .match-results__teams{min-width:0;margin:0;grid-column:auto}.public-playoff-match strong{grid-column:auto;justify-self:end;white-space:nowrap;font-variant-numeric:tabular-nums}
 
 /* El modal reserva una altura real para que el formulario siempre termine dentro de su scroll. */
 .tournament-dialog:not([open]){display:none}.tournament-dialog{height:min(760px,calc(100dvh - 24px));max-height:calc(100dvh - 24px);display:flex;flex-direction:column;overflow:hidden}.tournament-dialog>.kicker,.tournament-dialog>h2,.tournament-subnav{flex:0 0 auto}.detail-pages{flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding-bottom:env(safe-area-inset-bottom)}.detail-pages section{padding-bottom:48px}.registration-page form{padding-bottom:24px}.registration-page form>.button:last-child{margin-bottom:max(12px,env(safe-area-inset-bottom))}
