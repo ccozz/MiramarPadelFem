@@ -26,8 +26,8 @@
       const loserId = match.winner_pair_id === match.pair_one_id ? match.pair_two_id : match.pair_one_id;
       const loser = rows.get(loserId);
       if (!winner || !loser) return;
-      winner.played += 1; winner.won += 1; winner.points += 1;
-      loser.played += 1; loser.lost += 1;
+      winner.played += 1; winner.won += 1; winner.points += 2;
+      loser.played += 1; loser.lost += 1; loser.points += 1;
       String(match.score || '').split(',').forEach(set => {
         const values = set.trim().match(/^(\d+)\s*-\s*(\d+)$/);
         if (!values) return;
@@ -42,7 +42,21 @@
         pairTwo.gamesWon += second; pairTwo.gamesLost += first;
       });
     });
-    return [...rows.values()].sort((left, right) => right.points - left.points || (right.setsWon - right.setsLost) - (left.setsWon - left.setsLost) || (right.gamesWon - right.gamesLost) - (left.gamesWon - left.gamesLost) || right.won - left.won || left.label.localeCompare(right.label, 'es'));
+    const ordered = [...rows.values()].sort((left, right) => right.points - left.points);
+    for (let index = 0; index < ordered.length;) {
+      const tied = ordered.filter(row => row.points === ordered[index].points);
+      const bySetAndGameDifference = (left, right) => (right.setsWon - right.setsLost) - (left.setsWon - left.setsLost) || (right.gamesWon - right.gamesLost) - (left.gamesWon - left.gamesLost);
+      if (tied.length === 2) {
+        const [first, second] = tied;
+        const direct = matches.find(match => match.winner_pair_id && ((match.pair_one_id === first.id && match.pair_two_id === second.id) || (match.pair_one_id === second.id && match.pair_two_id === first.id)));
+        if (direct?.winner_pair_id === second.id) { const firstIndex = ordered.indexOf(first); const secondIndex = ordered.indexOf(second); [ordered[firstIndex], ordered[secondIndex]] = [ordered[secondIndex], ordered[firstIndex]]; }
+        else ordered.splice(index, tied.length, ...tied.sort(bySetAndGameDifference));
+      } else if (tied.length > 2) {
+        ordered.splice(index, tied.length, ...tied.sort(bySetAndGameDifference));
+      }
+      index += tied.length;
+    }
+    return ordered;
   };
 
   const playoffStage = matchCount => ({ 1: 'final', 2: 'semi_final', 4: 'quarter_final', 8: 'round_of_16' }[matchCount] || 'round_of_16');
