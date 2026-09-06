@@ -11,7 +11,16 @@
     const title = document.querySelector('#dialog-title');
     document.querySelector('.tournament-subnav')?.remove();
     if (!title) return;
-    title.insertAdjacentHTML('afterend', '<nav class="tournament-subnav" aria-label="Secciones del torneo"><a href="#tournament-summary">Resumen</a><a href="#tournament-groups">Fixture</a><a href="#tournament-results">Resultados</a><a href="#tournament-pairs">Parejas</a></nav>');
+    title.insertAdjacentHTML('afterend', '<nav class="tournament-subnav" aria-label="Secciones del torneo"><button type="button" data-detail-page="tournament-summary" aria-controls="tournament-summary">Resumen</button><button type="button" data-detail-page="tournament-groups" aria-controls="tournament-groups">Fixture</button><button type="button" data-detail-page="tournament-results" aria-controls="tournament-results">Resultados</button><button type="button" data-detail-page="tournament-pairs" aria-controls="tournament-pairs">Parejas</button></nav>');
+    const pages = document.querySelector('#detail-pages');
+    const nav = document.querySelector('.tournament-subnav');
+    const showPage = id => {
+      pages.querySelectorAll(':scope > section[id]').forEach(section => { section.hidden = section.id !== id; });
+      nav.querySelectorAll('[data-detail-page]').forEach(button => { const active = button.dataset.detailPage === id; button.classList.toggle('is-active', active); button.setAttribute('aria-current', active ? 'page' : 'false'); });
+      pages.scrollTop = 0;
+    };
+    nav.addEventListener('click', event => { const button = event.target.closest('[data-detail-page]'); if (button && pages.querySelector(`#${button.dataset.detailPage}`)) showPage(button.dataset.detailPage); });
+    showPage('tournament-summary');
   };
 
   async function applyPublicRules(tournamentId) {
@@ -89,9 +98,10 @@
     const playoffContent = (playoffMatches || []).length ? `<div class="playoff-results"><small>PLAYOFFS</small>${['round_of_16','quarter_final','semi_final','final'].map(stage => {
       const matches = (playoffMatches || []).filter(match => match.stage === stage); if (!matches.length) return '';
       const roundName = window.PadelTournament.playoffStageLabel(stage);
-      const sourceLabel = sourceId => { const source = (playoffMatches || []).find(match => match.id === sourceId); const shortName = { round_of_16: 'Octavos', quarter_final: 'Cuartos', semi_final: 'Semis', final: 'Final' }[source?.stage]; return source ? `${shortName} ${source.bracket_position}` : 'Pendiente'; };
+      const position = (match, index) => Number.isInteger(match.bracket_position) ? match.bracket_position : index + 1;
+      const sourceLabel = sourceId => { const sourceIndex = (playoffMatches || []).findIndex(match => match.id === sourceId); const source = (playoffMatches || [])[sourceIndex]; const shortName = { round_of_16: 'Octavos', quarter_final: 'Cuartos', semi_final: 'Semis', final: 'Final' }[source?.stage]; return source ? `${shortName} ${position(source, sourceIndex)}` : 'Pendiente'; };
       const entrant = (pairId, sourceId) => pairId ? label(playoffPairMap.get(pairId) || {}) : sourceId ? sourceLabel(sourceId) : 'Pendiente';
-      return `<details class="public-playoff-round"><summary>${roundName}</summary>${matches.map(match => `<div class="public-playoff-match"><small>${roundName} ${match.bracket_position}</small><span>${esc(entrant(match.pair_one_id, match.source_pair_one_match_id))}</span><span>${esc(entrant(match.pair_two_id, match.source_pair_two_match_id))}</span><strong>${esc(match.score ? String(match.score).replace(/,\s*/g, ' | ') : 'Pendiente')}</strong></div>`).join('')}</details>`;
+      return `<details class="public-playoff-round"><summary>${roundName}</summary>${matches.map((match, index) => `<div class="public-playoff-match"><small>${roundName} ${position(match, index)}</small><span>${esc(entrant(match.pair_one_id, match.source_pair_one_match_id))}</span><span>${esc(entrant(match.pair_two_id, match.source_pair_two_match_id))}</span><strong>${esc(match.score ? String(match.score).replace(/,\s*/g, ' | ') : 'Pendiente')}</strong></div>`).join('')}</details>`;
     }).join('')}</div>` : '';
     const pairsSection = `<section data-public-results="true" id="tournament-pairs"><small>05 · PAREJAS INSCRIPTAS</small>${enrolledPairs?.length ? `<ul class="pairs-list public-pairs-list">${enrolledPairs.map(pair => `<li><span>${esc(pair.tournament_categories?.name || '')}</span>${esc(label(pair))}</li>`).join('')}</ul>` : '<p>Aún no hay parejas confirmadas.</p>'}</section>`;
     pages.querySelectorAll('[data-public-results]').forEach(node => node.remove());

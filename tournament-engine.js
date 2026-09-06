@@ -46,7 +46,7 @@
   };
 
   const playoffStage = matchCount => ({ 1: 'final', 2: 'semi_final', 4: 'quarter_final', 8: 'round_of_16' }[matchCount] || 'round_of_16');
-  const playoffStageLabel = stage => ({ round_of_16: 'Previa', quarter_final: 'Cuartos de final', semi_final: 'Semifinales', final: 'Final' }[stage] || 'Playoffs');
+  const playoffStageLabel = stage => ({ round_of_16: 'Octavos de final', quarter_final: 'Cuartos de final', semi_final: 'Semifinales', final: 'Final' }[stage] || 'Playoffs');
   const buildPlayoffPlan = standings => {
     const seeded = standings.map(row => row.id);
     if (seeded.length < 2) return null;
