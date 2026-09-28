@@ -61,7 +61,7 @@ function tournamentForm(t = editingTournament) {
   const open = isEdit ? '' : '<details class="admin-collapsible"><summary>Crear torneo</summary>';
   const close = isEdit ? '' : '</details>';
   const schedule = Object.fromEntries((t?.tournament_phase_dates || []).map(phase => [phase.stage, phase]));
-  const phaseFields = [['group','Grupos'],['round_of_16','Octavos'],['quarter_final','Cuartos'],['semi_final','Semifinales'],['final','Final']].map(([stage,label]) => `<fieldset class="phase-dates"><legend>${label}</legend><label>Desde<input type="date" name="${stage}Start" value="${esc(schedule[stage]?.start_date)}"></label><label>Hasta<input type="date" name="${stage}End" value="${esc(schedule[stage]?.end_date)}"></label></fieldset>`).join('');
+  const phaseFields = [['group','Grupos'],['round_of_32','Dieciseisavos'],['round_of_16','Octavos'],['quarter_final','Cuartos'],['semi_final','Semifinales'],['final','Final']].map(([stage,label]) => `<fieldset class="phase-dates"><legend>${label}</legend><label>Desde<input type="date" name="${stage}Start" value="${esc(schedule[stage]?.start_date)}"></label><label>Hasta<input type="date" name="${stage}End" value="${esc(schedule[stage]?.end_date)}"></label></fieldset>`).join('');
   return `<section class="admin-card"><p class="kicker">TORNEOS</p>${isEdit ? '<h1>Modificar torneo</h1>' : open}<form id="tournament-form" class="admin-grid">
     <label>Nombre<input name="title" value="${esc(t?.title)}" required></label><label>Sede<input name="location" value="${esc(t?.location)}" required></label>
     <label>Inicio<input type="date" name="startDate" value="${esc(t?.start_date)}" required></label><label>Cierre<input type="date" name="endDate" value="${esc(t?.end_date)}" required></label>
