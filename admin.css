@@ -1,4 +1,7 @@
 @media (max-width:700px){
+  .admin-layout{padding:12px 10px;overflow-x:hidden}
+  .admin-workspace{overflow-x:hidden}
+  .admin-card{padding:14px 10px;overflow-x:hidden}
   .admin-sidebar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;align-items:center;gap:6px;overflow:visible}
   .admin-sidebar>.kicker{display:none}
   .admin-tab{min-height:48px;padding:12px 8px;font-size:13px;white-space:nowrap;text-align:center;font-weight:700}
@@ -325,6 +328,51 @@ html[data-theme='dark'] .button--edit:hover { background: #d4af37; color: #0d1b2
 html[data-theme='dark'] .button--delete { background: #36171a; border-color: #d32f2f; color: #ff8a80; }
 html[data-theme='dark'] .button--delete:hover { background: #d32f2f; color: #fff; }
 
+/* Filas de torneos y parejas: botones siempre en una sola línea y compactos */
+.admin-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+.admin-row > div:first-child {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.admin-row .admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
+.admin-row .admin-actions .button {
+  min-height: 32px;
+  height: 32px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+@media (max-width: 600px) {
+  .admin-row {
+    gap: 8px;
+    padding: 10px 0;
+  }
+  .admin-row .admin-actions {
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .admin-row .admin-actions .button {
+    min-height: 28px;
+    height: 28px;
+    padding: 2px 7px;
+    font-size: 11px;
+  }
+}
+
 /* Sticky action bar en modal de torneos */
 .modal-actions--sticky {
   position: sticky;
@@ -419,12 +467,14 @@ html[data-theme='dark'] .player-found-badge {
 }
 .players-registry-table {
   width: 100%;
+  max-width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 13px;
 }
 .players-registry-table th,
 .players-registry-table td {
-  padding: 8px 10px;
+  padding: 8px 6px;
   border-bottom: 1px solid var(--line);
   white-space: nowrap;
   vertical-align: middle;
@@ -438,57 +488,105 @@ html[data-theme='dark'] .player-found-badge {
   letter-spacing: .05em;
   text-align: center;
 }
-.players-registry-table tr:hover td {
-  background: color-mix(in srgb, var(--green) 4%, var(--paper));
-}
+.players-registry-table th.col-dni,
 .players-registry-table td.col-dni {
+  width: 70px;
   text-align: center;
   font-weight: 700;
 }
+.players-registry-table th.col-cat,
 .players-registry-table td.col-cat {
+  width: 44px;
   text-align: center;
   font-weight: 700;
 }
-.players-registry-table td.col-phone {
-  text-align: center;
+.players-registry-table th.col-name,
+.players-registry-table td.col-name {
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.players-registry-table td.col-actions {
-  text-align: center;
+.players-registry-table th.col-alias,
+.players-registry-table td.col-alias {
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.players-registry-table .admin-actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  flex-wrap: nowrap;
+.player-row-clickable {
+  cursor: pointer;
+  transition: background .15s ease;
 }
-.players-registry-table .button {
-  min-height: 28px;
-  height: 28px;
-  padding: 2px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  border-radius: 4px;
-  line-height: 1;
+.player-row-clickable:hover td {
+  background: color-mix(in srgb, var(--green) 8%, var(--paper));
 }
+.player-row-clickable:active td {
+  background: color-mix(in srgb, var(--green) 16%, var(--paper));
+}
+
 @media (max-width: 600px) {
   .players-registry-details {
-    padding: 10px 8px;
+    padding: 8px 6px;
   }
   .players-registry-table th,
   .players-registry-table td {
-    padding: 6px 4px;
+    padding: 6px 3px;
     font-size: 11px;
   }
-  .players-registry-table .hide-mobile {
-    display: none;
+  .players-registry-table th.col-dni,
+  .players-registry-table td.col-dni {
+    width: 56px;
+    font-size: 10px;
+    padding: 6px 1px;
   }
+  .players-registry-table th.col-cat,
+  .players-registry-table td.col-cat {
+    width: 32px;
+    font-size: 10px;
+    padding: 6px 1px;
+  }
+}
+
 .padron-alias {
   color: var(--green);
   font-weight: 600;
 }
 html[data-theme='dark'] .padron-alias {
   color: var(--green-light);
+}
+
+/* Ficha de jugadora en modal */
+.player-sheet-card {
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 16px;
+}
+.player-sheet-field {
+  display: grid;
+  gap: 2px;
+}
+.player-sheet-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+}
+.player-sheet-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.player-sheet-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 @keyframes fadeIn {

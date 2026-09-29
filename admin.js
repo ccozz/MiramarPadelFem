@@ -134,6 +134,45 @@ function playersDatalistHtml() {
   `;
 }
 
+function openPlayerDetailsModal(dni) {
+  const p = playersRegistry.get(String(dni));
+  if (!p) return;
+  playerModal.innerHTML = `
+    <div class="modal-header">
+      <h2>Ficha de Jugadora</h2>
+      <button type="button" class="modal-close" id="close-player-modal" aria-label="Cerrar">×</button>
+    </div>
+    <div class="player-sheet-card">
+      <div class="player-sheet-field">
+        <span class="player-sheet-label">DNI</span>
+        <span class="player-sheet-value">${esc(p.dni)}</span>
+      </div>
+      <div class="player-sheet-field">
+        <span class="player-sheet-label">Jugadora</span>
+        <span class="player-sheet-value">${esc(p.last)}, ${esc(p.first)}</span>
+      </div>
+      <div class="player-sheet-field">
+        <span class="player-sheet-label">Alias</span>
+        <span class="player-sheet-value" style="color:var(--green);">${esc(p.alias || '-')}</span>
+      </div>
+      <div class="player-sheet-field">
+        <span class="player-sheet-label">Categoría declarada</span>
+        <span class="player-sheet-value">${esc(p.category || '-')}</span>
+      </div>
+      <div class="player-sheet-field">
+        <span class="player-sheet-label">Teléfono de contacto</span>
+        <span class="player-sheet-value">${esc(p.phone || '-')}</span>
+      </div>
+    </div>
+    <div class="player-sheet-actions">
+      <button type="button" class="button button--edit button--small" data-edit-player="${esc(p.dni)}">Editar</button>
+      <button type="button" class="button button--delete button--small" data-delete-player="${esc(p.dni)}">Eliminar</button>
+      <button type="button" id="cancel-player-modal" class="button button--cancel button--small">Cerrar</button>
+    </div>
+  `;
+  if (!playerModal.open) playerModal.showModal();
+}
+
 function openEditPlayerModal(dni) {
   const p = playersRegistry.get(String(dni));
   if (!p) return;
@@ -559,30 +598,23 @@ async function renderPairs() {
       <table class="players-registry-table">
         <thead>
           <tr>
-            <th>DNI</th>
-            <th>Jugadora</th>
-            <th>Alias</th>
-            <th>CAT</th>
-            <th class="hide-mobile">Teléfono</th>
-            <th>Acciones</th>
+            <th class="col-dni">DNI</th>
+            <th class="col-name">Jugadora</th>
+            <th class="col-alias">Alias</th>
+            <th class="col-cat">CAT</th>
           </tr>
         </thead>
         <tbody id="players-registry-tbody">
-          ${sortedPlayers.map(pl => `
-            <tr>
+          ${sortedPlayers.map(pl => {
+            const shortCat = esc(pl.category ? pl.category.replace(/ Femenino|damas/gi, '').trim() : '-');
+            return `
+            <tr class="player-row-clickable" data-player-dni="${esc(pl.dni)}" title="Tocar para ver datos y opciones">
               <td class="col-dni"><b>${esc(pl.dni)}</b></td>
               <td class="col-name">${esc(pl.last)}, ${esc(pl.first)}</td>
               <td class="col-alias"><span class="padron-alias">${esc(pl.alias || '-')}</span></td>
-              <td class="col-cat"><b>${esc(pl.category || '-')}</b></td>
-              <td class="col-phone hide-mobile">${esc(pl.phone || '-')}</td>
-              <td class="col-actions">
-                <div class="admin-actions">
-                  <button type="button" class="button button--edit" data-edit-player="${esc(pl.dni)}">Editar</button>
-                  <button type="button" class="button button--delete" data-delete-player="${esc(pl.dni)}">Eliminar</button>
-                </div>
-              </td>
-            </tr>
-          `).join('')}
+              <td class="col-cat"><b>${shortCat}</b></td>
+            </tr>`;
+          }).join('')}
         </tbody>
       </table>
     </details>
@@ -1171,6 +1203,12 @@ document.addEventListener('click', async event => {
     if (active === 'tournaments') await renderTournaments(); else await renderPairs();
   }
 
+  const playerRow = event.target.closest('[data-player-dni]');
+  if (playerRow && !event.target.closest('button')) {
+    openPlayerDetailsModal(playerRow.dataset.playerDni);
+    return;
+  }
+
   const editPlayerBtn = event.target.closest('[data-edit-player]');
   if (editPlayerBtn) {
     openEditPlayerModal(editPlayerBtn.dataset.editPlayer);
@@ -1189,6 +1227,7 @@ document.addEventListener('click', async event => {
     deletePlayerBtn.disabled = true;
     playersRegistry.delete(dni);
     await sb.from('players').delete().eq('dni', dni);
+    playerModal?.close();
     await renderPairs();
     return;
   }
