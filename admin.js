@@ -167,7 +167,6 @@ function openPlayerDetailsModal(dni) {
     <div class="player-sheet-actions">
       <button type="button" class="button button--edit button--small" data-edit-player="${esc(p.dni)}">Editar</button>
       <button type="button" class="button button--delete button--small" data-delete-player="${esc(p.dni)}">Eliminar</button>
-      <button type="button" id="cancel-player-modal" class="button button--cancel button--small">Cerrar</button>
     </div>
   `;
   if (!playerModal.open) playerModal.showModal();
